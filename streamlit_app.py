@@ -31,7 +31,8 @@ def load_data(zip_file):
                 if not subtype:
                     subtype = 'message'
                 display_name = record.get('user_profile', {}).get('display_name', 'Unknown')
-                data.append({'file_name': file_name, 'subtype': subtype, 'display_name': display_name})
+                text = record.get('text', '')
+                data.append({'file_name': file_name, 'subtype': subtype, 'display_name': display_name, 'text': text})
 
     # Create a DataFrame from the collected data
     df = pd.DataFrame(data)
@@ -76,3 +77,13 @@ if uploaded_file is not None:
     fig_heatmap.update_layout(xaxis=dict(tickmode='linear', tickvals=heatmap_df['file_name'].unique()))
 
     st.plotly_chart(fig_heatmap)
+
+    # Filter data for bot_message subtype
+    bot_message_df = df[df['subtype'] == 'bot_message']
+
+    # Create a horizontal bar chart for the text field where subtype="bot_message"
+    if not bot_message_df.empty:
+        fig_bot_message = px.bar(bot_message_df, x='text', y=bot_message_df.index, orientation='h',
+                                 title='Bot Messages', labels={'text': 'Message Text', 'index': 'Record Index'},
+                                 hover_data={'text': True})
+        st.plotly_chart(fig_bot_message)
