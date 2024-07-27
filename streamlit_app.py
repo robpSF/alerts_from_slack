@@ -3,7 +3,7 @@ import zipfile
 import os
 import json
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
 from datetime import datetime
 
 # Function to load the data from the uploaded zip file
@@ -52,12 +52,10 @@ if uploaded_file is not None:
     # Display the data
     st.write(df)
 
-    # Create a bar chart
-    fig, ax = plt.subplots()
-    ax.bar(df['date'], df['record_count'], color='blue')
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Number of Records")
-    ax.set_title("Number of Alert Records per Date")
-    plt.xticks(rotation=45)
-    st.pyplot(fig)
+    # Create an interactive bar chart
+    fig = px.bar(df, x='date', y='record_count', title='Number of Alert Records per Date', 
+                 labels={'date': 'Date', 'record_count': 'Number of Records'},
+                 hover_data={'date': True, 'record_count': True})
+    fig.update_layout(xaxis=dict(tickmode='linear'))
 
+    st.plotly_chart(fig)
