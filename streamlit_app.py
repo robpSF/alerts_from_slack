@@ -41,10 +41,12 @@ def load_data(zip_file):
                     date = timestamp.strftime('%Y-%m-%d')
                     day_of_week = timestamp.strftime('%A')
                     time = timestamp.strftime('%H:%M:%S')
+                    hour = timestamp.strftime('%H')
                 else:
                     date = ''
                     day_of_week = ''
                     time = ''
+                    hour = ''
                 data.append({
                     'file_name': file_name, 
                     'subtype': subtype, 
@@ -52,7 +54,8 @@ def load_data(zip_file):
                     'text': text, 
                     'date': date, 
                     'day_of_week': day_of_week, 
-                    'time': time
+                    'time': time,
+                    'hour': hour
                 })
 
     # Create a DataFrame from the collected data
@@ -109,3 +112,11 @@ if uploaded_file is not None:
         merged_df = pd.merge(bot_message_df, text_count_df, on='text')
         st.write("Bot Messages Text Count with Date and Time")
         st.dataframe(merged_df[['text', 'count', 'date', 'day_of_week', 'time']].drop_duplicates())
+
+    # Create a chart for count of day_of_week and time (grouped into hour of the day)
+    if not filtered_df.empty:
+        day_hour_df = filtered_df.groupby(['day_of_week', 'hour']).size().reset_index(name='count')
+        fig_day_hour = px.bar(day_hour_df, x='hour', y='count', color='day_of_week', barmode='group',
+                              title='Count of Alerts by Day of Week and Hour of the Day',
+                              labels={'hour': 'Hour of the Day', 'count': 'Count', 'day_of_week': 'Day of Week'})
+        st.plotly_chart(fig_day_hour)
