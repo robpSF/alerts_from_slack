@@ -111,6 +111,19 @@ if uploaded_file is not None:
         text_count_df.columns = ['text', 'count']
         merged_df = pd.merge(bot_message_df, text_count_df, on='text')
         bot_message_table = merged_df[['text', 'count', 'date', 'day_of_week', 'time', 'hour']].drop_duplicates()
+
+        # Set maximum width for the table
+        st.markdown(
+            """
+            <style>
+            .dataframe-table {
+                width: 100% !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
         st.write("Bot Messages Text Count with Date and Time")
         st.dataframe(bot_message_table)
 
@@ -121,3 +134,26 @@ if uploaded_file is not None:
                                   title='Count of Bot Messages by Day of Week and Hour of the Day',
                                   labels={'hour': 'Hour of the Day', 'count': 'Count', 'day_of_week': 'Day of Week'})
             st.plotly_chart(fig_day_hour)
+
+    # Message Frequency Analysis
+    daily_activity_df = df.groupby('date').size().reset_index(name='count')
+    fig_daily_activity = px.line(daily_activity_df, x='date', y='count', title='Daily Activity',
+                                 labels={'date': 'Date', 'count': 'Number of Messages'})
+    st.plotly_chart(fig_daily_activity)
+
+    hourly_activity_df = df.groupby('hour').size().reset_index(name='count')
+    fig_hourly_activity = px.bar(hourly_activity_df, x='hour', y='count', title='Hourly Activity',
+                                 labels={'hour': 'Hour of the Day', 'count': 'Number of Messages'})
+    st.plotly_chart(fig_hourly_activity)
+
+    # User Activity Analysis
+    user_activity_df = df.groupby('display_name').size().reset_index(name='count')
+    fig_user_activity = px.bar(user_activity_df, x='display_name', y='count', title='User Activity',
+                               labels={'display_name': 'User', 'count': 'Number of Messages'})
+    st.plotly_chart(fig_user_activity)
+
+    # Common Phrases Analysis (example: show top 10 most common messages)
+    common_phrases_df = df['text'].value_counts().reset_index().head(10)
+    common_phrases_df.columns = ['text', 'count']
+    st.write("Top 10 Most Common Messages")
+    st.dataframe(common_phrases_df)
