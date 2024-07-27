@@ -76,23 +76,12 @@ if uploaded_file is not None:
     # Display the data
     st.write(df)
 
-    # Dropdown to select the file for analysis
-    file_names = df['file_name'].unique()
-    selected_file = st.selectbox("Select a file for analysis", file_names)
-
-    # Filter data specifically for the selected file
-    specific_file_df = df[df['file_name'] == selected_file]
-
-    # Display data for the specific file
-    st.write(f"Data for {selected_file}")
-    st.write(specific_file_df)
-
     # Get unique subtypes
-    subtypes = specific_file_df['subtype'].unique()
+    subtypes = df['subtype'].unique()
     selected_subtypes = st.multiselect("Select subtypes to filter", subtypes, default=subtypes)
 
     # Filter data based on selected subtypes
-    filtered_df = specific_file_df[specific_file_df['subtype'].isin(selected_subtypes)]
+    filtered_df = df[df['subtype'].isin(selected_subtypes)]
 
     # Create an interactive bar chart
     bar_df = filtered_df.groupby('file_name').size().reset_index(name='record_count')
@@ -112,6 +101,17 @@ if uploaded_file is not None:
     fig_heatmap.update_layout(xaxis=dict(tickmode='linear', tickvals=heatmap_df['file_name'].unique()))
 
     st.plotly_chart(fig_heatmap)
+
+    # Dropdown to select the file for detailed analysis
+    file_names = filtered_df['file_name'].unique()
+    selected_file = st.selectbox("Select a file for detailed analysis", file_names)
+
+    # Filter data specifically for the selected file
+    specific_file_df = filtered_df[filtered_df['file_name'] == selected_file]
+
+    # Display data for the specific file
+    st.write(f"Data for {selected_file}")
+    st.write(specific_file_df)
 
     # Filter data for bot_message subtype
     bot_message_df = specific_file_df[specific_file_df['subtype'] == 'bot_message']
