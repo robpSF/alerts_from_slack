@@ -76,12 +76,19 @@ if uploaded_file is not None:
     # Display the data
     st.write(df)
 
+    # Filter data specifically for the file '2024-07-22'
+    specific_file_df = df[df['file_name'] == '2024-07-22']
+
+    # Display data for the specific file
+    st.write("Data for 2024-07-22")
+    st.write(specific_file_df)
+
     # Get unique subtypes
-    subtypes = df['subtype'].unique()
+    subtypes = specific_file_df['subtype'].unique()
     selected_subtypes = st.multiselect("Select subtypes to filter", subtypes, default=subtypes)
 
     # Filter data based on selected subtypes
-    filtered_df = df[df['subtype'].isin(selected_subtypes)]
+    filtered_df = specific_file_df[specific_file_df['subtype'].isin(selected_subtypes)]
 
     # Create an interactive bar chart
     bar_df = filtered_df.groupby('file_name').size().reset_index(name='record_count')
@@ -103,7 +110,7 @@ if uploaded_file is not None:
     st.plotly_chart(fig_heatmap)
 
     # Filter data for bot_message subtype
-    bot_message_df = df[df['subtype'] == 'bot_message']
+    bot_message_df = specific_file_df[specific_file_df['subtype'] == 'bot_message']
 
     # Create a table for the text field where subtype="bot_message"
     if not bot_message_df.empty:
@@ -136,24 +143,24 @@ if uploaded_file is not None:
             st.plotly_chart(fig_day_hour)
 
     # Message Frequency Analysis
-    daily_activity_df = df.groupby('date').size().reset_index(name='count')
+    daily_activity_df = specific_file_df.groupby('date').size().reset_index(name='count')
     fig_daily_activity = px.line(daily_activity_df, x='date', y='count', title='Daily Activity',
                                  labels={'date': 'Date', 'count': 'Number of Messages'})
     st.plotly_chart(fig_daily_activity)
 
-    hourly_activity_df = df.groupby('hour').size().reset_index(name='count')
+    hourly_activity_df = specific_file_df.groupby('hour').size().reset_index(name='count')
     fig_hourly_activity = px.bar(hourly_activity_df, x='hour', y='count', title='Hourly Activity',
                                  labels={'hour': 'Hour of the Day', 'count': 'Number of Messages'})
     st.plotly_chart(fig_hourly_activity)
 
     # User Activity Analysis
-    user_activity_df = df.groupby('display_name').size().reset_index(name='count')
+    user_activity_df = specific_file_df.groupby('display_name').size().reset_index(name='count')
     fig_user_activity = px.bar(user_activity_df, x='display_name', y='count', title='User Activity',
                                labels={'display_name': 'User', 'count': 'Number of Messages'})
     st.plotly_chart(fig_user_activity)
 
     # Common Phrases Analysis (example: show top 10 most common messages)
-    common_phrases_df = df['text'].value_counts().reset_index().head(10)
+    common_phrases_df = specific_file_df['text'].value_counts().reset_index().head(10)
     common_phrases_df.columns = ['text', 'count']
-    st.write("Top 10 Most Common Messages")
+    st.write("Top 10 Most Common Messages in 2024-07-22")
     st.dataframe(common_phrases_df)
