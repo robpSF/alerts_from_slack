@@ -76,11 +76,15 @@ if uploaded_file is not None:
     # Display the data
     st.write(df)
 
-    # Filter data specifically for the file '2024-07-22'
-    specific_file_df = df[df['file_name'] == '2024-07-22']
+    # Dropdown to select the file for analysis
+    file_names = df['file_name'].unique()
+    selected_file = st.selectbox("Select a file for analysis", file_names)
+
+    # Filter data specifically for the selected file
+    specific_file_df = df[df['file_name'] == selected_file]
 
     # Display data for the specific file
-    st.write("Data for 2024-07-22")
+    st.write(f"Data for {selected_file}")
     st.write(specific_file_df)
 
     # Get unique subtypes
@@ -142,12 +146,7 @@ if uploaded_file is not None:
                                   labels={'hour': 'Hour of the Day', 'count': 'Count', 'day_of_week': 'Day of Week'})
             st.plotly_chart(fig_day_hour)
 
-    # Message Frequency Analysis
-    daily_activity_df = specific_file_df.groupby('date').size().reset_index(name='count')
-    fig_daily_activity = px.line(daily_activity_df, x='date', y='count', title='Daily Activity',
-                                 labels={'date': 'Date', 'count': 'Number of Messages'})
-    st.plotly_chart(fig_daily_activity)
-
+    # Hourly Activity Analysis
     hourly_activity_df = specific_file_df.groupby('hour').size().reset_index(name='count')
     fig_hourly_activity = px.bar(hourly_activity_df, x='hour', y='count', title='Hourly Activity',
                                  labels={'hour': 'Hour of the Day', 'count': 'Number of Messages'})
@@ -162,5 +161,5 @@ if uploaded_file is not None:
     # Common Phrases Analysis (example: show top 10 most common messages)
     common_phrases_df = specific_file_df['text'].value_counts().reset_index().head(10)
     common_phrases_df.columns = ['text', 'count']
-    st.write("Top 10 Most Common Messages in 2024-07-22")
+    st.write(f"Top 10 Most Common Messages in {selected_file}")
     st.dataframe(common_phrases_df)
