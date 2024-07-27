@@ -4,7 +4,6 @@ import os
 import json
 import pandas as pd
 import plotly.express as px
-from datetime import datetime
 
 # Function to load the data from the uploaded zip file
 def load_data(zip_file):
