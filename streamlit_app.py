@@ -73,6 +73,6 @@ if uploaded_file is not None:
                                      title='Heatmap of Mentions by File and Display Name',
                                      labels={'file_name': 'File Name', 'display_name': 'Display Name', 'count': 'Count'},
                                      hover_data={'file_name': True, 'display_name': True, 'count': True})
-    fig_heatmap.update_layout(xaxis=dict(tickmode='linear'))
+    fig_heatmap.update_layout(xaxis=dict(tickmode='linear', tickvals=heatmap_df['file_name'].unique()))
 
     st.plotly_chart(fig_heatmap)
