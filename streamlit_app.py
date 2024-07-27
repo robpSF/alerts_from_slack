@@ -81,9 +81,9 @@ if uploaded_file is not None:
     # Filter data for bot_message subtype
     bot_message_df = df[df['subtype'] == 'bot_message']
 
-    # Create a horizontal bar chart for the text field where subtype="bot_message"
+    # Create a table for the text field where subtype="bot_message"
     if not bot_message_df.empty:
-        fig_bot_message = px.bar(bot_message_df, x='text', y=bot_message_df.index, orientation='h',
-                                 title='Bot Messages', labels={'text': 'Message Text', 'index': 'Record Index'},
-                                 hover_data={'text': True})
-        st.plotly_chart(fig_bot_message)
+        text_count_df = bot_message_df['text'].value_counts().reset_index()
+        text_count_df.columns = ['text', 'count']
+        st.write("Bot Messages Text Count")
+        st.dataframe(text_count_df)
