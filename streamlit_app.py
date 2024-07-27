@@ -4,6 +4,7 @@ import os
 import json
 import pandas as pd
 import plotly.express as px
+from datetime import datetime
 
 # Function to load the data from the uploaded zip file
 def load_data(zip_file):
@@ -32,7 +33,25 @@ def load_data(zip_file):
                     subtype = 'message'
                 display_name = record.get('user_profile', {}).get('display_name', 'Unknown')
                 text = record.get('text', '')
-                data.append({'file_name': file_name, 'subtype': subtype, 'display_name': display_name, 'text': text})
+                ts = record.get('ts', '')
+                if ts:
+                    timestamp = datetime.fromtimestamp(float(ts))
+                    date = timestamp.strftime('%Y-%m-%d')
+                    day_of_week = timestamp.strftime('%A')
+                    time = timestamp.strftime('%H:%M:%S')
+                else:
+                    date = ''
+                    day_of_week = ''
+                    time = ''
+                data.append({
+                    'file_name': file_name, 
+                    'subtype': subtype, 
+                    'display_name': display_name, 
+                    'text': text, 
+                    'date': date, 
+                    'day_of_week': day_of_week, 
+                    'time': time
+                })
 
     # Create a DataFrame from the collected data
     df = pd.DataFrame(data)
@@ -85,5 +104,6 @@ if uploaded_file is not None:
     if not bot_message_df.empty:
         text_count_df = bot_message_df['text'].value_counts().reset_index()
         text_count_df.columns = ['text', 'count']
-        st.write("Bot Messages Text Count")
-        st.dataframe(text_count_df)
+        merged_df = pd.merge(bot_message_df, text_count_df, on='text')
+        st.write("Bot Messages Text Count with Date and Time")
+        st.dataframe(merged_df[['text', 'count', 'date', 'day_of_week', 'time']].drop_duplicates())
