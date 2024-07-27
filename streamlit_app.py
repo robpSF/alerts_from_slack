@@ -75,6 +75,6 @@ if uploaded_file is not None:
                                      title='Heatmap of Alert Records by Date and Subtype',
                                      labels={'date': 'Date', 'subtype': 'Subtype', 'count': 'Count'},
                                      hover_data={'date': True, 'subtype': True, 'count': True})
-    fig_heatmap.update_layout(xaxis=dict(tickmode='linear'))
+    fig_heatmap.update_layout(xaxis=dict(tickmode='linear', tickvals=heatmap_df['date'].unique()))
 
     st.plotly_chart(fig_heatmap)
