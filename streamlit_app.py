@@ -21,15 +21,18 @@ def load_data(zip_file):
     # Initialize a list to store the data
     data = []
 
-    # Read each valid JSON file and collect the number of records and subtypes
+    # Read each valid JSON file and collect the relevant data
     for json_file in json_files:
         file_name = json_file.split('.')[0]
         file_path = os.path.join(alerts_folder_path, json_file)
         with open(file_path, 'r') as f:
             records = json.load(f)
             for record in records:
-                subtype = record.get('subtype', 'Unknown')
-                data.append({'file_name': file_name, 'subtype': subtype})
+                subtype = record.get('subtype', 'message')
+                if not subtype:
+                    subtype = 'message'
+                display_name = record.get('user_profile', {}).get('display_name', 'Unknown')
+                data.append({'file_name': file_name, 'subtype': subtype, 'display_name': display_name})
 
     # Create a DataFrame from the collected data
     df = pd.DataFrame(data)
@@ -65,12 +68,12 @@ if uploaded_file is not None:
 
     st.plotly_chart(fig_bar)
 
-    # Create a heatmap of file_name and subtype
-    heatmap_df = filtered_df.groupby(['file_name', 'subtype']).size().reset_index(name='count')
-    fig_heatmap = px.density_heatmap(heatmap_df, x='file_name', y='subtype', z='count', 
-                                     title='Heatmap of Alert Records by File and Subtype',
-                                     labels={'file_name': 'File Name', 'subtype': 'Subtype', 'count': 'Count'},
-                                     hover_data={'file_name': True, 'subtype': True, 'count': True})
+    # Create a heatmap of file_name and display_name
+    heatmap_df = filtered_df.groupby(['file_name', 'display_name']).size().reset_index(name='count')
+    fig_heatmap = px.density_heatmap(heatmap_df, x='file_name', y='display_name', z='count', 
+                                     title='Heatmap of Mentions by File and Display Name',
+                                     labels={'file_name': 'File Name', 'display_name': 'Display Name', 'count': 'Count'},
+                                     hover_data={'file_name': True, 'display_name': True, 'count': True})
     fig_heatmap.update_layout(xaxis=dict(tickmode='linear'))
 
     st.plotly_chart(fig_heatmap)
