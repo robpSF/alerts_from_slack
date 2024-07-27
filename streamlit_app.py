@@ -110,13 +110,14 @@ if uploaded_file is not None:
         text_count_df = bot_message_df['text'].value_counts().reset_index()
         text_count_df.columns = ['text', 'count']
         merged_df = pd.merge(bot_message_df, text_count_df, on='text')
+        bot_message_table = merged_df[['text', 'count', 'date', 'day_of_week', 'time']].drop_duplicates()
         st.write("Bot Messages Text Count with Date and Time")
-        st.dataframe(merged_df[['text', 'count', 'date', 'day_of_week', 'time']].drop_duplicates())
+        st.dataframe(bot_message_table)
 
-    # Create a chart for count of day_of_week and time (grouped into hour of the day)
-    if not filtered_df.empty:
-        day_hour_df = filtered_df.groupby(['day_of_week', 'hour']).size().reset_index(name='count')
-        fig_day_hour = px.bar(day_hour_df, x='hour', y='count', color='day_of_week', barmode='group',
-                              title='Count of Alerts by Day of Week and Hour of the Day',
-                              labels={'hour': 'Hour of the Day', 'count': 'Count', 'day_of_week': 'Day of Week'})
-        st.plotly_chart(fig_day_hour)
+        # Create a chart for count of day_of_week and time (grouped into hour of the day) using bot_message_table
+        if not bot_message_table.empty:
+            day_hour_df = bot_message_table.groupby(['day_of_week', 'hour']).size().reset_index(name='count')
+            fig_day_hour = px.bar(day_hour_df, x='hour', y='count', color='day_of_week', barmode='group',
+                                  title='Count of Bot Messages by Day of Week and Hour of the Day',
+                                  labels={'hour': 'Hour of the Day', 'count': 'Count', 'day_of_week': 'Day of Week'})
+            st.plotly_chart(fig_day_hour)
