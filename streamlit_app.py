@@ -33,6 +33,8 @@ def load_data(zip_file):
                     subtype = 'message'
                 display_name = record.get('user_profile', {}).get('display_name', 'Unknown')
                 text = record.get('text', '')
+                if text == '':
+                    continue
                 ts = record.get('ts', '')
                 if ts:
                     timestamp = datetime.fromtimestamp(float(ts))
