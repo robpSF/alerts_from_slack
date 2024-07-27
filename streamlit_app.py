@@ -110,7 +110,7 @@ if uploaded_file is not None:
         text_count_df = bot_message_df['text'].value_counts().reset_index()
         text_count_df.columns = ['text', 'count']
         merged_df = pd.merge(bot_message_df, text_count_df, on='text')
-        bot_message_table = merged_df[['text', 'count', 'date', 'day_of_week', 'time']].drop_duplicates()
+        bot_message_table = merged_df[['text', 'count', 'date', 'day_of_week', 'time', 'hour']].drop_duplicates()
         st.write("Bot Messages Text Count with Date and Time")
         st.dataframe(bot_message_table)
 
